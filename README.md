@@ -60,6 +60,7 @@ SENDERPASSKEY=""
 SENDERMAIL=""
 SENDEREMAILPASSWORD=""
 SMTP=""
+SEVEMAILAPIURL=""
 ```
 
 ### **5. Run the Application Locally**
