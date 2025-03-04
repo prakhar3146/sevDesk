@@ -96,11 +96,6 @@ Additional information :
 - **Firewall & Security Groups** configured in AWS.
 - **Regular security audits** to identify vulnerabilities.
 
-## **API Endpoints**
-| Method | Endpoint               | Description                     |
-|--------|------------------------|---------------------------------|
-| GET    | `/health`              | Check API health status        |
-| POST   | `/execute-sync`        | Trigger contact synchronization |
 
 ## **Contributing**
 1. Fork the repository.
