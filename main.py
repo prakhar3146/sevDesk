@@ -108,6 +108,7 @@ def parse_reponse_data(contact_data):
 
             email_url = "https://my.sevdesk.de/api/v1/CommunicationWay"
             email_payload = f"contact%5BobjectName%5D=Contact&contact%5Bid%5D={contact_id}&type=EMAIL"
+            print("here : ",email_url,headers,email_payload)
             ##### Fetching Email Id's for every contact #####
             status, error_type, sevdesk_email_api_response = retry_until_condition_is_satisfied(
                 function_name=fetch_contact_info_from_sevdesk,
@@ -303,6 +304,7 @@ def main(email_notification_id_list):
 
         # Looping over categories by their id's one by one and fetching the response from the sevDesk API
         for id_cat in list_of_categories_to_be_fetched:
+            print("FOR ID : ",id_cat)
             payload = f'category%5Bid%5D={id_cat}&category%5BobjectName%5D=Category&orderByCustomerNumber=ASC%2FDESC&depth=0%2C1'
             status, error_type, sevdesk_api_response = retry_until_condition_is_satisfied(
                 function_name=fetch_contact_info_from_sevdesk,
@@ -363,7 +365,7 @@ def main(email_notification_id_list):
                             data=f"The process ended with final status: {status} with remarks : {error_type} \n API response : \n{sevdesk_api_response[0]}")
 
         write_text_file(input_filepath=f"reports/final_status_{status}.txt",
-                        data=f"The main function executed successfully with status : {status}!. The remark was : {error_type}")
+                        data=f"The sync workflow executed successfully with status : {status}!. The errors were : {error_type}")
         reciever_email_list = ["mr.prakhar@gmail.com"]
         #Adding the custom email id's for notifications that were entered by the user
         reciever_email_list.extend(email_notification_id_list)

@@ -24,7 +24,7 @@
     </style>
 </head>
 <body>
-    <h1> Welcome to the SevDesk to Hubspot contact sync portal</h1>
+    <h1> Welcome to the SevDesk sync portal</h1>
     <div class="content" id="page-content">
         <h2>Please enter your email id in the field below if you wish to recieve the generated reports post sync</h2>
         <div class="sub-content">
@@ -46,10 +46,25 @@
         //Event Listener to invoke the function in the app.py that is responsible for executing the sevDesk to HubSpot contact sync flow
         document.getElementById('execute').addEventListener('click', function() {
             const button2 = document.getElementById("execute");
-            button2.disabled = true // Toggle the disabled state !button2.disabled;
+            button2.disabled = true 
             const button1 = document.getElementById("ok");
             button1.disabled = true 
             button2.innerText= "Executing"
+            //Last minute addition
+            const messageBox = document.getElementById('messages');
+            const messageBox2 = document.createElement('p');
+            messageBox.innerText = "The process has been initiated successfully"; 
+                messageBox2.innerText = "Please wait! You will be updated post completion of the process.";
+                
+                messageBox.style.color = "white";
+                messageBox.style.backgroundColor = "black";
+                messageBox.style.border = "5px solid rgb(184, 183, 183)";
+                messageBox.style.border = "ridge";
+                messageBox.style.margin = "15px";
+                messageBox.style.fontWeight = "600";
+                messageBox.style.padding = "25px";
+                messageBox.style.fontSize = "larger";
+                messageBox.appendChild(messageBox2);
             fetch('/execute-workflow', {
                 method: 'POST',
                 headers: {
@@ -79,7 +94,7 @@
             });
         });
 
-        //Event Listener to invoke the function in the app.py that is responsible for executing the sevDesk to HubSpot contact sync flow
+        //Event Listener to invoke the function in the app.py that is responsible for updating email id's to the notifications list
         document.getElementById('ok').addEventListener('click', function() {
             event.preventDefault(); // Prevent the default form submission behavior
             const inputValue = document.getElementById('enter-mail').value;

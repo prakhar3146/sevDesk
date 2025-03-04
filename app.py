@@ -34,6 +34,8 @@ def execute_workflow():
         return jsonify({'result': f"Workflow executed successfully but no records were found that needed to be synced!"})
     elif result== "success":
         return jsonify({'result': f"Workflow executed successfully and records were updated!"})
+    else:
+        return jsonify({'result': f"Workflow execution failed with error message : {error_type}"})
 
 @app.route('/submit', methods=['POST'])
 def submit_email():

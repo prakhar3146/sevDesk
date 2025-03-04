@@ -1,0 +1,8 @@
+firstname,lastname,email,company,website,lifecyclestage
+Test,User,mr.prakhar@gmail.com,HubSpot,hubspot.com,customer
+,,abc@gmail.com,HubSpot,hubspot.com,customer
+Testing,Testid,testid@gmail.com,HubSpot,hubspot.com,customer
+Prakhar,Prakash,mr.prakhar@example.com,HubSpot,hubspot.com,customer
+,,sevdesk@example.com,HubSpot,hubspot.com,customer
+,,mr.prakhar@testgmail.com,HubSpot,hubspot.com,customer
+,,mr.prakhar@gmail5.com,HubSpot,hubspot.com,customer
