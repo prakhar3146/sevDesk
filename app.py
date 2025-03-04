@@ -18,13 +18,14 @@ email_id_list= []
 log(input_filepath="reports/email_ids_for_notification.txt",data="",separator="\n")
 ##########################################################################################################################################################################################################################################
 
+
 ########################################################### Custom Routes And Functions #################################################################################################################################################################################
 @app.route("/")
 def welcome():
     return render_template("index.html")
 
 
-
+#This function is responsible for executing the workflow
 @app.route('/execute-workflow', methods=['POST'])
 def execute_workflow():
     # Calling the main function in main.py to start the sync
@@ -37,17 +38,18 @@ def execute_workflow():
     else:
         return jsonify({'result': f"Workflow execution failed with error message : {error_type}"})
 
+#This function is responsible for validating and adding email id's in the email list
 @app.route('/submit', methods=['POST'])
 def submit_email():
     # Adding email id's entered by the user to notification email id list and displaying the status in the UI
     global email_id_list
     data = request.json
     input_value = data.get('value')
-    print("An email was added :", input_value,"\n to the list : ",email_id_list)
+    # print("An email was added :", input_value,"\n to the list : ",email_id_list)
     #Verifying the format of the entered email
     pattern = "^[\w! # $ % & ' * + - / = ? ^ _.]+[@][A-za-z]+\.[A-za-z]{1,3}$"
     if re.fullmatch(pattern=pattern, string=input_value):
-        email_id_list.append(input_value)
+        email_id_list.append(input_value.strip())
         log(input_filepath="reports/email_ids_for_notification.txt",data=input_value,separator="\n", mode="a")
         return jsonify({'result': f"{input_value} was added to the mailing list"})
     else:
@@ -55,6 +57,6 @@ def submit_email():
     
 ##################################################################################################################################################################################################################################################################################################################################################################    
 
-
+#For testing in local system
 if __name__ == '__main__':
     app.run(host ="127.0.0.1", debug=True, port= 5000)

@@ -55,8 +55,7 @@ def fetch_contact_info_from_sevdesk(url, headers, payload):
     try:
 
         response = requests.request("GET", url, headers=headers, data=payload)
-        # print("Status : ", response.status_code)
-        # print(response.text)
+  
         status = response.status_code
         if status == 200:
             return "success", "", [response]
@@ -75,8 +74,7 @@ def fetch_contact_info_from_hubspot(url, headers, payload={}):
     try:
 
         response = requests.request("GET", url, headers=headers, data=payload)
-        # print("Status : ", response.status_code)
-        # print(response.text)
+      
         status = response.status_code
         if status == 200:
             return "success", "", [response]
@@ -100,15 +98,15 @@ def parse_reponse_data(contact_data):
 
         # Segregating Organizations and Individuals
         for contact in contact_data:
-            print("Contact : ", contact['name'])
+            
             contact_id = contact['id']
             entity_type = "individual" if contact['name'] is None else "organization"
             if entity_type not in ["individual", "organization"]:
                 continue
 
-            email_url = "https://my.sevdesk.de/api/v1/CommunicationWay"
+            email_url = os.getenv("SEVEMAILAPIURL")
             email_payload = f"contact%5BobjectName%5D=Contact&contact%5Bid%5D={contact_id}&type=EMAIL"
-            print("here : ",email_url,headers,email_payload)
+           
             ##### Fetching Email Id's for every contact #####
             status, error_type, sevdesk_email_api_response = retry_until_condition_is_satisfied(
                 function_name=fetch_contact_info_from_sevdesk,
@@ -118,7 +116,7 @@ def parse_reponse_data(contact_data):
                 return status, error_type, [f"Failed to retrieve the email id for {contact_id}",
                                             sevdesk_email_api_response]
             email_data = sevdesk_email_api_response[0].json()["objects"]
-            # print(f"Email data retrievd for :{contact_id} \n is: {email_data}")
+            
             if len(email_data) == 0:
                 continue
             email_id = email_data[0]['value']
@@ -140,12 +138,11 @@ def create_contact_hubspot(url_hub, headers_hub, attributes_dict: dict):
     try:
         # Create the contact
         # contact = api_client.crm.contacts.basic_api.create(SimplePublicObjectInput(**attributes_dict))
-        # print(f"Contact created with ID: {contact.id}")
+        
         payload = json.dumps(attributes_dict)
 
         response = requests.request("POST", url_hub, headers=headers_hub, data=payload)
-        print("Creation Status : ", response.status_code)
-        # print("Creation Response : ", response.text)
+        
         if response.status_code != 201:
             return "failed"
         return "success"
@@ -163,18 +160,16 @@ def create_contact_hubspot(url_hub, headers_hub, attributes_dict: dict):
 def fetch_contact_info_from_hubspot_and_create(api_client_hubspot, sevdesk_contact_df):
     try:
         # Fetch all contacts
-        print("The sevdesk contacts : ", sevdesk_contact_df.columns)
+        
         sevdesk_contact_df.drop_duplicates(subset='email_id', inplace=True)
         all_contacts = api_client_hubspot.crm.contacts.get_all()
-        # Connecting to hubspot api
-        # hub_response = fetch_contact_info_from_hubspot(hubspot_url,hubspot_headers)
 
         sevdesk_emails = set(sevdesk_contact_df['email_id'])
 
         hubspot_emails = []
         hubspot_conatcts = []
         for contact in all_contacts:
-            # print("Keys : ", contact.properties.keys())
+           
             hubspot_email = contact.properties.get('email')  # contact['properties']['email']
             hubspot_firstname = contact.properties.get('firstname')
             hubspot_lastname = contact.properties.get('lastname')
@@ -192,9 +187,6 @@ def fetch_contact_info_from_hubspot_and_create(api_client_hubspot, sevdesk_conta
         emails_to_be_created = list(sevdesk_emails - hubspot_emails)
         additional_emails_in_hubspot = hubspot_emails - sevdesk_emails
 
-        print("Email id not present in Hubspot : ", emails_to_be_created)
-        print("Email id not present in sevdesk : ", list(additional_emails_in_hubspot))
-        print("The sevdesk contacts : ", sevdesk_contact_df.columns)
 
         if len(emails_to_be_created) == 0:
             return "success", "no_action_needed", ["sevDesk and HubSpot already in Sync!"]
@@ -207,7 +199,7 @@ def fetch_contact_info_from_hubspot_and_create(api_client_hubspot, sevdesk_conta
         for email in emails_to_be_created:
             contact_data = sevdesk_contact_df.loc[sevdesk_contact_df["email_id"] == email]
             contact_data.reset_index(drop=True, inplace=True)
-            # print("Onboard data : ", contact_data)
+      
             first_name = contact_data.get(key="surename")[0]
             last_name = contact_data.get(key='familyname')[0]
             email_id_onboard = contact_data.get(key='email_id')[0]
@@ -223,11 +215,7 @@ def fetch_contact_info_from_hubspot_and_create(api_client_hubspot, sevdesk_conta
                     "lifecyclestage": "customer"
                 }
             }
-            # if not first_name:
-            #     del contact_properties['firstname']
-            # if not last_name:
-            #     del contact_properties['lastname']
-            print("Creating : ", contact_properties)
+            
             creation_status = create_contact_hubspot(url_hub=hubspot_url, headers_hub=hubspot_headers,
                                                      attributes_dict=contact_properties)  # create_contact_hubspot(api_client_hubspot, contact_properties)
             if creation_status == "failed":
@@ -304,7 +292,7 @@ def main(email_notification_id_list):
 
         # Looping over categories by their id's one by one and fetching the response from the sevDesk API
         for id_cat in list_of_categories_to_be_fetched:
-            print("FOR ID : ",id_cat)
+            
             payload = f'category%5Bid%5D={id_cat}&category%5BobjectName%5D=Category&orderByCustomerNumber=ASC%2FDESC&depth=0%2C1'
             status, error_type, sevdesk_api_response = retry_until_condition_is_satisfied(
                 function_name=fetch_contact_info_from_sevdesk,
@@ -325,7 +313,7 @@ def main(email_notification_id_list):
             sevdesk_all_contacts_df.to_csv("reports/All_contacts_sevdesk.csv", index=False)
 
             status, error_type, reconciled_list = parse_reponse_data(list_of_contacts_fetched_sevdesk)
-            print("Executed \n", status, error_type, reconciled_list)
+            
             if status == "success":
 
                 sevdesk_contact_df = pd.DataFrame(reconciled_list)
@@ -335,7 +323,7 @@ def main(email_notification_id_list):
                     argument_list=[api_client, sevdesk_contact_df], time_until_retry=4, no_of_retries=5,
                     value_to_be_satisfied="success")
                 status = final_status
-                print("Creation Status : ", final_status, error_type)
+                
                 if final_status == "success" and error_type == "no_action_needed":
                     print("No records need to be inserted!")
                     write_text_file(input_filepath=f"reports/final_status_{final_status}.txt",
@@ -369,7 +357,8 @@ def main(email_notification_id_list):
         reciever_email_list = ["mr.prakhar@gmail.com"]
         #Adding the custom email id's for notifications that were entered by the user
         reciever_email_list.extend(email_notification_id_list)
-        print("The email id's are ",reciever_email_list)
+        reciever_email_list =list(set(reciever_email_list))
+       
         credentials_dict = {'invite_template_path': "templates/email_template.html", 'sender': os.getenv("SENDERMAIL"),
                             'secret_key': os.getenv("SENDERPASSKEY"), 'port': 587,
                             'password': os.getenv("SENDEREMAILPASSWORD"),
