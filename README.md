@@ -5,7 +5,7 @@ This repository contains the source code for automating the **sevDesk to HubSpot
 
 **Proof of Concept:**
 - **GitHub:** [sevDesk Repository](https://github.com/prakhar3146/sevDesk.git)
-- **AWS Server:** [EC2 Instance](http://ec2-13-61-192-233.eu-north-1.compute.amazonaws.com)
+
 
 ## **Tech Stack**
 - **Backend:** Python (Flask)
