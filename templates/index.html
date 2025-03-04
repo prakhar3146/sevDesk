@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sevdesk HubSpot Sync</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+          body{
+            /* background-image: url('static/images/main_2.jpg'); */
+            background-image: url("{{ url_for('static', filename='images/main_2.jpg') }}");
+    overflow: auto;
+    object-fit: cover;
+    min-height: 100%;
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1%;
+        }
+    </style>
+</head>
+<body>
+    <h1> Welcome to the SevDesk to Hubspot contact sync portal</h1>
+    <div class="content" id="page-content">
+        <h2>Please enter your email id in the field below if you wish to recieve the generated reports post sync</h2>
+        <div class="sub-content">
+        <label for="email">Email ID : </label>
+        <input type="text" class="enter-mail" id="enter-mail" placeholder="Enter your email id" style="border: 3px solid black;"></input>
+        <button type="submit" id="ok">Submit</button>
+    </div>
+        <button id="execute">Execute Sync</button>
+        <!-- <button id="stop">Abrupt stop</button> -->
+</div>
+<div id="messages">
+    
+</div>
+<footer>
+    <p>This application is developed as a proof of concept for the hubspot contact creation automation by syncing with sevDesk.</p>
+</footer>
+
+    <script>
+        //Event Listener to invoke the function in the app.py that is responsible for executing the sevDesk to HubSpot contact sync flow
+        document.getElementById('execute').addEventListener('click', function() {
+            const button2 = document.getElementById("execute");
+            button2.disabled = true // Toggle the disabled state !button2.disabled;
+            const button1 = document.getElementById("ok");
+            button1.disabled = true 
+            button2.innerText= "Executing"
+            fetch('/execute-workflow', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageBox1 = document.getElementById('messages');
+                button2.disabled = false;
+                button1.disabled = false;
+                button2.innerText = "Execute Sync"
+                messageBox1.innerText = data.result;
+                messageBox1.style.color = "Blue";
+                messageBox1.style.backgroundColor = "black";
+
+                messageBox1.style.margin = "15px";
+                messageBox1.style.fontWeight = "600";
+                messageBox1.style.padding = "25px";
+                messageBox1.style.fontSize = "larger";
+                console.log(data.result);
+
+              
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        //Event Listener to invoke the function in the app.py that is responsible for executing the sevDesk to HubSpot contact sync flow
+        document.getElementById('ok').addEventListener('click', function() {
+            event.preventDefault(); // Prevent the default form submission behavior
+            const inputValue = document.getElementById('enter-mail').value;
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ value: inputValue })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Displaying the message on the HTML page
+                const messageBox = document.getElementById('messages');
+                messageBox.innerText = data.result;
+                messageBox.style.color = "red";
+                messageBox.style.backgroundColor = "black";
+                messageBox.style.margin = "2px";
+                console.log(data.result);
+                // Handle the result here (e.g., display it on the page)
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+            // Clear the input field
+            document.getElementById('enter-mail').value = '';
+        });
+    
+    </script>
+</body>
+</html>
