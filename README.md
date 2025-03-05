@@ -104,8 +104,6 @@ Additional information :
 3. Commit your changes.
 4. Open a pull request.
 
-## **License**
-This project is licensed under the MIT License.
 
 ## **Contact**
 📧 **Email:** mr.prakhar@gmail.com  
